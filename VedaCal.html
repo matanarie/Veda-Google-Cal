@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Veda's Calendar</title>
+	<link rel='stylesheet' href='CSS/fullcalendar.css' />
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<!--<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"><!--The Basic jQuery UI Theme-->
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/start/jquery-ui.css"><!--The Start jQuery UI Theme-->
+	<script src='JS/moment.js'></script>
+	<script src='JS/fullcalendar.js'></script>
+	<script src='JS/gcal.js'></script>
+	
+	<script type="text/javascript">
+		$(function() {
+			$('#calendar').fullCalendar({
+				height: $(window).height() - 30,	//set height of calender to window height
+				googleCalendarApiKey: 'AIzaSyCreNGJixeVYeeC7-rt70BEfeEyKrSdDM8',
+				events: {
+					googleCalendarId: 'vedakahn@gmail.com'
+				},
+				themeSystem: 'jquery-ui',
+				defaultView: 'agendaWeek',
+				titleFormat: 'DD MMMM YYYY',
+				columnHeaderFormat: 'dddd DD/MM',
+      			scrollTime: "07:00:00",	//show day starting at this time
+				nowIndicator: true,	//show red line at current time
+				header: {	//chose what appears in the header
+				  left:   'prev, today',
+				  center: 'title',
+				  right:  'today, next'
+				},
+				buttonText: {	//change the name text that appears on the buttons
+					prev: 'Show Previous Week',
+					next: 'Show Following Week',
+					today: 'Show Current Week'
+				},
+				eventClick: function(event) {	//disable clicking on events
+					if (event.url) {
+						return false;
+					}
+				},
+				eventRender: function (event, element) {
+					element.attr('href', 'javascript:void(0);');
+					element.click(function() {
+						$("#startTime").html('<b>Starts:</b>&nbsp;'+moment(event.start).format('DD MMMM HH:mm ')+'<br />');
+						$("#endTime").html('<b>Ends:</b>&nbsp;&nbsp;&nbsp;'+moment(event.end).format('DD MMMM HH:mm'));
+						if(event.allDay){
+							$("#startTime").html('<b>Starts:</b>&nbsp;'+moment(event.start).format('DD MMMM')+'<br />');
+							$("#endTime").html('<b>Ends:</b>&nbsp;&nbsp;&nbsp;'+moment(event.end).format('DD MMMM'));
+						}
+						if(typeof event.location !== 'undefined'){	//if a location exists, load it
+							$("#eventLocation").html('<br /><br /><b>Location:</b><br />'+event.location);	
+						}
+						if(typeof event.description !== 'undefined'){	//if a description exists, load it
+							$("#eventInfo").html('<br /><br />'+event.description);
+						}
+						//$("#eventLink").attr('href', event.url);
+						$("#eventContent").dialog({
+							modal: true,
+							title: event.title,
+							width:350,
+							open: function(event, ui) { //hides the popup if user clicks outside
+								$('.ui-widget-overlay').bind('click', function() { 
+									$(this).siblings('.ui-dialog').find('.ui-dialog-content').dialog('close'); 
+								});
+							},
+							close: function(event, ui) { //empties the various fields when the dialog is closed
+								$("#eventContent").children().empty();
+								//$("#startTime").empty();
+								//$("#endTime").empty();
+								//$("#eventLocation").empty();
+								//$("#eventInfo").empty();
+							}
+						});
+					});
+				}
+		  	});
+		});	
+	</script>
+</head>
+
+<body>
+	<div id="calendar"></div>
+	<div id="eventContent" title="Event Details" style="display:none;">
+		<span id="startTime"></span>
+		<span id="endTime"></span>
+		<span id="eventLocation"></span>
+		<span id="eventInfo"></span>
+	</div>
+</body>
+</html>
